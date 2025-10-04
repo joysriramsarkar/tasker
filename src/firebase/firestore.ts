@@ -19,7 +19,7 @@ const getTasksCollectionRef = (userId: string) =>
 
 export async function addTask(
   userId: string,
-  taskData: { title: string; duration: number, dueDate: Date }
+  taskData: { title: string; duration: number, dueDate: Date, recurrence: Task['recurrence'] }
 ): Promise<string | null> {
   try {
     const tasksCollection = getTasksCollectionRef(userId);
@@ -28,7 +28,6 @@ export async function addTask(
       status: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      recurrence: 'none',
     });
     return docRef.id;
   } catch (error) {
@@ -133,7 +132,8 @@ export async function completeTask(
         await addTask(userId, {
             title: task.title,
             duration: 0, // Reset duration for new recurring task
-            dueDate: tomorrow
+            dueDate: tomorrow,
+            recurrence: task.recurrence, // Preserve the recurrence
         });
     }
     // TODO: Add logic for weekly and monthly recurrence

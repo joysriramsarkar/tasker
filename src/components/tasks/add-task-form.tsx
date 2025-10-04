@@ -32,6 +32,7 @@ export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
         title: values.title,
         duration: durationInSeconds,
         dueDate: new Date(),
+        recurrence: 'none'
     });
     if (taskId) {
       toast({ title: "কাজ যোগ করা হয়েছে", description: values.title });
