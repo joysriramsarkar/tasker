@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import type { Task } from "@/types";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { getTasks } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { getTasks } from "@/firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader } from "@/components/loader";

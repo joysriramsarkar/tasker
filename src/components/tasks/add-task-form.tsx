@@ -3,8 +3,8 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { addTask } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { addTask } from "@/firebase/firestore";
 import { parseDuration } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";

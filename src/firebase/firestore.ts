@@ -1,4 +1,3 @@
-// THIS FILE IS AN EXACT DUPLICATE OF src/firebase/firestore.ts
 import type { Unsubscribe } from 'firebase/firestore';
 import {
   addDoc,

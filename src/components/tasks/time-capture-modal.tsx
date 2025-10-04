@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { completeTask } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { completeTask } from "@/firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { formatDuration, parseDuration } from "@/lib/utils";
 

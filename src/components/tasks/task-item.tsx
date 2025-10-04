@@ -1,11 +1,11 @@
 "use client";
 
 import type { Task } from "@/types";
-import { useAuth } from "@/lib/firebase/auth-context";
+import { useAuth } from "@/firebase/auth-context";
 import { useTimer } from "@/hooks/use-timer";
-import { updateTask } from "@/lib/firebase/firestore";
+import { updateTask } from "@/firebase/firestore";
 import { useEffect, useState } from "react";
-import { formatDuration } from "@/lib/utils";
+import { formatDurationBengali } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Play, Pause, Check, Edit } from "lucide-react";
 import { TimeCaptureModal } from "./time-capture-modal";
@@ -25,7 +25,10 @@ export function TaskItem({ task }: { task: Task }) {
     if (task.status === 'in-progress' && status !== 'running') {
       start();
     }
-  }, [task.status, status, start]);
+     if (task.status === 'pending' && status === 'running') {
+      pause();
+    }
+  }, [task.status, status, start, pause]);
   
   useEffect(() => {
     const persistDuration = async () => {
@@ -57,7 +60,7 @@ export function TaskItem({ task }: { task: Task }) {
       <div className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md">
         <span className="flex-1 font-medium">{task.title}</span>
         <div className="flex items-center gap-1 text-lg font-semibold tabular-nums text-muted-foreground">
-          <span>{formatDuration(seconds)}</span>
+          <span className="font-mono">{formatDurationBengali(seconds)}</span>
           <Button variant="ghost" size="icon" onClick={handleTogglePlay}>
             {status === "running" ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
             <span className="sr-only">{status === "running" ? "Pause" : "Start"}</span>

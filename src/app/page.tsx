@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/firebase/auth-context";
+import { useAuth } from "@/firebase/auth-context";
 import AuthPage from "@/components/auth-page";
 import MainApp from "@/components/main-app";
 import { Loader } from "@/components/loader";

@@ -1,4 +1,3 @@
-// THIS FILE IS AN EXACT DUPLICATE OF src/firebase/auth-context.tsx
 "use client";
 
 import type { User } from 'firebase/auth';

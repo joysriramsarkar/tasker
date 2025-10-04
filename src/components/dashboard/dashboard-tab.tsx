@@ -1,8 +1,8 @@
 "use client";
 
 import type { Task } from "@/types";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { getTasks } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { getTasks } from "@/firebase/firestore";
 import { useEffect, useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bar, BarChart, CartesianGrid, Pie, PieChart, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend, Cell } from "recharts";

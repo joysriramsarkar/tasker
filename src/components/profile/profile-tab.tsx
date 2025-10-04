@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/lib/firebase/auth-context";
+import { useAuth } from "@/firebase/auth-context";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +38,8 @@ export default function ProfileTab() {
         title: "প্রোফাইল আপডেট হয়েছে",
         description: "আপনার তথ্য সফলভাবে সংরক্ষণ করা হয়েছে।",
       });
+      // This will trigger a re-render in the main layout to show the new name
+      window.location.reload();
     } catch (error) {
       console.error("Error updating profile: ", error);
       toast({

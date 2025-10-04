@@ -1,4 +1,3 @@
-// THIS FILE IS AN EXACT DUPLICATE OF src/firebase/config.ts
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 

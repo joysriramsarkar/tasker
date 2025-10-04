@@ -1,4 +1,3 @@
-// THIS FILE IS AN EXACT DUPLICATE OF src/firebase/auth.ts
 "use client";
 
 import {

@@ -2,11 +2,11 @@
 
 import { useEffect, useState, useMemo } from "react";
 import type { Task } from "@/types";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { getTasks } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { getTasks } from "@/firebase/firestore";
 import { format, isToday, isYesterday } from "date-fns";
 import { bn } from "date-fns/locale";
-import { formatDuration } from "@/lib/utils";
+import { formatDurationBengali } from "@/lib/utils";
 import {
   Accordion,
   AccordionContent,
@@ -82,7 +82,7 @@ export default function HistoryTab() {
                       >
                         <span>{task.title}</span>
                         <span className="font-mono text-sm font-semibold text-muted-foreground">
-                          {formatDuration(task.duration)}
+                          {formatDurationBengali(task.duration)}
                         </span>
                       </div>
                     ))}

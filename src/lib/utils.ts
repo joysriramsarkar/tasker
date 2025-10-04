@@ -6,11 +6,33 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDuration(totalSeconds: number): string {
+  if (isNaN(totalSeconds) || totalSeconds < 0) {
+    totalSeconds = 0;
+  }
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  const seconds = Math.floor(totalSeconds % 60);
 
   const pad = (num: number) => num.toString().padStart(2, '0');
+
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
+const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+const toBengaliNumber = (n: number) => {
+  return n.toString().split('').map(digit => bengaliDigits[parseInt(digit)]).join('');
+};
+
+
+export function formatDurationBengali(totalSeconds: number): string {
+  if (isNaN(totalSeconds) || totalSeconds < 0) {
+    totalSeconds = 0;
+  }
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor(totalSeconds % 60);
+
+  const pad = (num: number) => toBengaliNumber(num).padStart(2, '০');
 
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }

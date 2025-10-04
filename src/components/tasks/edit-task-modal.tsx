@@ -12,8 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { updateTask } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { updateTask } from "@/firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { formatDuration, parseDuration } from "@/lib/utils";
 import type { Task } from "@/types";
@@ -31,12 +31,15 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   const { toast } = useToast();
   const [title, setTitle] = useState(task.title);
   const [durationStr, setDurationStr] = useState(formatDuration(task.duration));
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(
+    task.completedAt ? task.completedAt.toDate() : new Date()
+  );
 
   useEffect(() => {
     if (isOpen) {
       setTitle(task.title);
       setDurationStr(formatDuration(task.duration));
+      setDate(task.completedAt ? task.completedAt.toDate() : new Date());
     }
   }, [isOpen, task]);
 

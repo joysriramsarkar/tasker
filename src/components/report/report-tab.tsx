@@ -7,8 +7,8 @@ import { useEffect, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/lib/firebase/auth-context";
-import { getTasks } from "@/lib/firebase/firestore";
+import { useAuth } from "@/firebase/auth-context";
+import { getTasks } from "@/firebase/firestore";
 import type { Task } from "@/types";
 import { Loader } from "../loader";
 
