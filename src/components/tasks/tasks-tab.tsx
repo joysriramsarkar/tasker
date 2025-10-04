@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { Task } from "@/types";
 import { useAuth } from "@/lib/firebase/auth-context";
 import { addTask, getTasks, updateTask } from "@/lib/firebase/firestore";
-import { formatDuration } from "@/lib/utils";
+import { formatDuration, parseDuration } from "@/lib/utils";
 import { useTimer } from "@/hooks/use-timer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,11 +15,12 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader } from "@/components/loader";
-import { Play, Pause, Check } from "lucide-react";
+import { Play, Pause, Check, Plus } from "lucide-react";
 import { TimeCaptureModal } from "./time-capture-modal";
 
 const formSchema = z.object({
   title: z.string().min(3, { message: "কাজের শিরোনাম কমপক্ষে ৩ অক্ষরের হতে হবে।" }),
+  duration: z.string().optional(),
 });
 
 function TaskItem({ task }: { task: Task }) {
@@ -85,16 +86,71 @@ function TaskItem({ task }: { task: Task }) {
   );
 }
 
-export default function TasksTab() {
+function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "" },
+    defaultValues: { title: "", duration: "" },
   });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (!user) return;
+    const durationInSeconds = values.duration ? parseDuration(values.duration) : 0;
+    const taskId = await addTask(user.uid, values.title, durationInSeconds);
+    if (taskId) {
+      toast({ title: "কাজ যোগ করা হয়েছে", description: values.title });
+      form.reset();
+      onTaskAdded();
+    } else {
+      toast({ variant: "destructive", title: "ত্রুটি", description: "কাজ যোগ করতে ব্যর্থ।" });
+    }
+  };
+
+  return (
+    <Card className="mb-6">
+      <CardContent className="p-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input placeholder="একটি নতুন কাজের শিরোনাম লিখুন..." {...field} className="text-base" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input placeholder="সময় (HH:MM:SS)" {...field} className="w-36 font-mono" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button type="submit" disabled={form.formState.isSubmitting}>
+              {form.formState.isSubmitting ? "যোগ হচ্ছে..." : "কাজ যোগ করুন"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}
+
+
+export default function TasksTab() {
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAddTask, setShowAddTask] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -106,45 +162,16 @@ export default function TasksTab() {
     return () => unsubscribe();
   }, [user]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!user) return;
-    const taskId = await addTask(user.uid, values.title);
-    if (taskId) {
-      toast({ title: "কাজ যোগ করা হয়েছে", description: values.title });
-      form.reset();
-    } else {
-      toast({ variant: "destructive", title: "ত্রুটি", description: "কাজ যোগ করতে ব্যর্থ।" });
-    }
-  };
-
   return (
     <div className="grid gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>নতুন কাজ যোগ করুন</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormControl>
-                      <Input placeholder="যেমন: জিমেইল ইনবক্স শূন্য করুন..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "যোগ হচ্ছে..." : "কাজ যোগ করুন"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+      {showAddTask ? (
+        <AddTaskForm onTaskAdded={() => setShowAddTask(false)} />
+      ) : (
+        <Button variant="outline" className="w-full justify-start p-4 text-muted-foreground" onClick={() => setShowAddTask(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          নতুন কাজ যোগ করুন
+        </Button>
+      )}
       
       <Card>
         <CardHeader>

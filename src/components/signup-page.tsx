@@ -10,6 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const formSchema = z.object({
+  name: z.string().min(3, { message: "নাম কমপক্ষে ৩ অক্ষরের হতে হবে।" }),
   email: z.string().email({ message: "সঠিক ইমেইল লিখুন।" }),
   password: z.string().min(6, { message: "পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।" }),
 });
@@ -18,11 +19,11 @@ export default function SignUpPage() {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "" },
   });
 
   const handleEmailSignUp = async (values: z.infer<typeof formSchema>) => {
-    const { error } = await signUpWithEmail(values.email, values.password);
+    const { error } = await signUpWithEmail(values.email, values.password, values.name);
     if (error) {
        toast({
         variant: "destructive",
@@ -44,6 +45,19 @@ export default function SignUpPage() {
     <div className="space-y-6">
        <Form {...form}>
         <form onSubmit={form.handleSubmit(handleEmailSignUp)} className="space-y-4">
+           <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>আপনার নাম</FormLabel>
+                <FormControl>
+                  <Input placeholder="আপনার পুরো নাম" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"

@@ -7,6 +7,7 @@ import {
   signOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  updateProfile,
 } from 'firebase/auth';
 import { auth } from './auth-context';
 
@@ -31,9 +32,10 @@ export async function signInWithFacebook() {
   }
 }
 
-export async function signUpWithEmail(email: string, password: string) {
+export async function signUpWithEmail(email: string, password: string, displayName: string) {
   try {
     const result = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(result.user, { displayName });
     return { user: result.user };
   } catch(error) {
     return { error };

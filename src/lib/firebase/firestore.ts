@@ -19,14 +19,15 @@ const getTasksCollectionRef = (userId: string) =>
 
 export async function addTask(
   userId: string,
-  title: string
+  title: string,
+  duration = 0,
 ): Promise<string | null> {
   try {
     const tasksCollection = getTasksCollectionRef(userId);
     const docRef = await addDoc(tasksCollection, {
       title,
       status: 'pending',
-      duration: 0,
+      duration,
       createdAt: serverTimestamp(),
     });
     return docRef.id;
