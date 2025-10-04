@@ -16,15 +16,25 @@ import { useAuth } from "@/firebase/auth-context";
 import { updateTask } from "@/firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import type { Task } from "@/types";
-import { Calendar } from "@/components/ui/calendar";
-import { bn } from "date-fns/locale";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "../ui/textarea";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { bn } from "date-fns/locale";
 
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
   isOpen: boolean;
@@ -36,7 +46,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description || '');
+  const [description, setDescription] = useState(task.description || "");
   const [recurrence, setRecurrence] = useState(task.recurrence || 'none');
   const [date, setDate] = useState<Date | undefined>(
     task.dueDate ? task.dueDate.toDate() : new Date()
@@ -45,7 +55,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   useEffect(() => {
     if (isOpen) {
       setTitle(task.title);
-      setDescription(task.description || '');
+      setDescription(task.description || "");
       setRecurrence(task.recurrence || 'none');
       setDate(task.dueDate ? task.dueDate.toDate() : new Date());
     }
@@ -112,8 +122,8 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
                 <SelectContent>
                     <SelectItem value="none">কখনই না</SelectItem>
                     <SelectItem value="daily">প্রতিদিন</SelectItem>
-                    <SelectItem value="weekly">সাপ্তাহিক (শীঘ্রই আসছে)</SelectItem>
-                    <SelectItem value="monthly">মাসিক (শীঘ্রই আসছে)</SelectItem>
+                    <SelectItem value="weekly" disabled>সাপ্তাহিক (শীঘ্রই আসছে)</SelectItem>
+                    <SelectItem value="monthly" disabled>মাসিক (শীঘ্রই আসছে)</SelectItem>
                 </SelectContent>
             </Select>
            </div>

@@ -10,6 +10,7 @@ import {
   updateDoc,
   where,
   Timestamp,
+  writeBatch,
 } from 'firebase/firestore';
 import type { Task } from '@/types';
 import { db } from './config';
@@ -25,7 +26,6 @@ export async function addTask(
     const tasksCollection = getTasksCollectionRef(userId);
     const docRef = await addDoc(tasksCollection, {
       ...taskData,
-      duration: 0,
       status: 'pending',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
@@ -116,30 +116,35 @@ export async function updateTask(
 export async function completeTask(
   userId: string,
   task: Task,
-  duration: number
 ): Promise<boolean> {
   try {
-    const taskDoc = doc(db, 'users', userId, 'tasks', task.id);
-    await updateDoc(taskDoc, {
+    const batch = writeBatch(db);
+    
+    const taskDocRef = doc(db, 'users', userId, 'tasks', task.id);
+    batch.update(taskDocRef, {
       status: 'completed',
-      duration,
       completedAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
 
     if (task.recurrence === 'daily') {
-        const tomorrow = new Date();
+        const tomorrow = new Date(task.dueDate.toDate());
         tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0,0,0,0); // Start of day
-        await addTask(userId, {
+
+        const newTaskRef = doc(collection(db, 'users', userId, 'tasks'));
+        batch.set(newTaskRef, {
             title: task.title,
             description: task.description,
-            dueDate: tomorrow,
-            recurrence: task.recurrence, // This was missing!
+            dueDate: Timestamp.fromDate(tomorrow),
+            recurrence: task.recurrence,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
         });
     }
     // TODO: Add logic for weekly and monthly recurrence
 
+    await batch.commit();
     return true;
   } catch (error) {
     console.error('Error completing task: ', error);

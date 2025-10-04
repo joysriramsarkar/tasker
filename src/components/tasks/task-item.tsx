@@ -16,7 +16,7 @@ export function TaskItem({ task }: { task: Task }) {
   
   const handleComplete = async () => {
       if (!user) return;
-      const success = await completeTaskInDb(user.uid, task, task.duration);
+      const success = await completeTaskInDb(user.uid, task);
       if (success) {
         toast({ title: "কাজ সম্পন্ন হয়েছে!", description: "আপনার কাজটি সফলভাবে সম্পন্ন তালিকায় যোগ করা হয়েছে।" });
       } else {
@@ -27,8 +27,13 @@ export function TaskItem({ task }: { task: Task }) {
   return (
     <>
       <div className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md">
-        <span className="flex-1 font-medium">{task.title}</span>
-        <div className="flex items-center gap-1 text-lg font-semibold tabular-nums text-muted-foreground">
+        <div className="flex-1 space-y-1">
+            <p className="font-medium">{task.title}</p>
+            {task.description && (
+                <p className="text-sm text-muted-foreground">{task.description}</p>
+            )}
+        </div>
+        <div className="flex items-center gap-1">
            <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
             <Edit className="h-5 w-5" />
             <span className="sr-only">Edit</span>

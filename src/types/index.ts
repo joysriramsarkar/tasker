@@ -8,7 +8,6 @@ export type Task = {
   updatedAt: Timestamp;
   completedAt?: Timestamp;
   dueDate: Timestamp;
-  duration: number; // in seconds
   status: 'pending' | 'in-progress' | 'completed';
   recurrence?: 'none' | 'daily' | 'weekly' | 'monthly';
 };
