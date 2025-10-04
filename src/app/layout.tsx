@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AuthProvider } from '@/lib/firebase/auth-context';
+import { AuthProvider } from '@/firebase/auth-context';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
 
