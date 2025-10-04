@@ -19,6 +19,8 @@ import { formatDuration, parseDuration } from "@/lib/utils";
 import type { Task } from "@/types";
 import { Calendar } from "@/components/ui/calendar";
 import { bn } from "date-fns/locale";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 type Props = {
   isOpen: boolean;
@@ -31,6 +33,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   const { toast } = useToast();
   const [title, setTitle] = useState(task.title);
   const [durationStr, setDurationStr] = useState(formatDuration(task.duration));
+   const [recurrence, setRecurrence] = useState(task.recurrence || 'none');
   const [date, setDate] = useState<Date | undefined>(
     task.completedAt ? task.completedAt.toDate() : new Date()
   );
@@ -39,6 +42,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
     if (isOpen) {
       setTitle(task.title);
       setDurationStr(formatDuration(task.duration));
+      setRecurrence(task.recurrence || 'none');
       setDate(task.completedAt ? task.completedAt.toDate() : new Date());
     }
   }, [isOpen, task]);
@@ -48,7 +52,11 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
     const finalDuration = parseDuration(durationStr);
     
     try {
-        await updateTask(user.uid, task.id, { title, duration: finalDuration });
+        await updateTask(user.uid, task.id, { 
+            title, 
+            duration: finalDuration,
+            recurrence: recurrence as Task['recurrence']
+        });
         toast({ title: "কাজ আপডেট হয়েছে", description: "আপনার পরিবর্তনগুলি সফলভাবে সংরক্ষণ করা হয়েছে।" });
         onClose();
     } catch (error) {
@@ -89,12 +97,20 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
             />
           </div>
            <div className="grid grid-cols-4 items-center gap-4">
-            <Label className="text-right">
+            <Label htmlFor="recurrence" className="text-right">
               পুনরাবৃত্তি
             </Label>
-            <div className="col-span-3">
-                <p className="text-sm text-muted-foreground">এই ফিচারটি শীঘ্রই আসছে।</p>
-            </div>
+             <Select value={recurrence} onValueChange={setRecurrence}>
+                <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="পুনরাবৃত্তির ধরণ নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="none">কখনই না</SelectItem>
+                    <SelectItem value="daily">প্রতিদিন</SelectItem>
+                    <SelectItem value="weekly">সাপ্তাহিক</SelectItem>
+                    <SelectItem value="monthly">মাসিক</SelectItem>
+                </SelectContent>
+            </Select>
            </div>
            <div className="flex justify-center">
              <Calendar
