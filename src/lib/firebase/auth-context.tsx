@@ -1,15 +1,22 @@
 "use client";
 
 import type { User } from 'firebase/auth';
-import { onAuthStateChanged, browserLocalPersistence, initializeAuth } from 'firebase/auth';
+import { onAuthStateChanged, browserLocalPersistence, initializeAuth, getAuth } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { app } from './config';
 
-// Initialize auth with browserLocalPersistence to avoid popup issues
-const auth = initializeAuth(app, {
-  persistence: browserLocalPersistence
-});
+// Initialize auth with browserLocalPersistence to avoid popup issues on page reload.
+// But for popups to work correctly, we need to get the auth instance via getAuth().
+try {
+  initializeAuth(app, {
+    persistence: browserLocalPersistence
+  });
+} catch (e) {
+  // Initialization can only happen once.
+}
+
+const auth = getAuth(app);
 
 type AuthContextType = {
   user: User | null;
