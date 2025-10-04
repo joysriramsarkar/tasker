@@ -38,18 +38,17 @@ export default function MainApp() {
   };
 
   const handleTabChange = (value: string) => {
-    if (value === 'profile') {
-      setShowProfile(true);
-      // Keep the visual indicator on the last active non-profile tab
-    } else {
       setShowProfile(false);
       setActiveTab(value);
-    }
   };
   
   const handleProfileClick = () => {
     setShowProfile(true);
-    // When profile is opened via dropdown, we don't want to change the main active tab indicator
+  }
+
+  const goHome = () => {
+    setShowProfile(false);
+    setActiveTab('tasks');
   }
 
   return (
@@ -57,10 +56,10 @@ export default function MainApp() {
       <header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur-sm">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-primary">
+            <button onClick={goHome} className="flex items-center gap-2 text-primary focus:outline-none">
                  <CheckSquare className="h-8 w-8" />
                  <h1 className="font-headline text-2xl font-bold">টাস্কার</h1>
-            </div>
+            </button>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -78,7 +77,7 @@ export default function MainApp() {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuLabel>আমার অ্যাকাউন্ট</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowProfile(true)}>
+              <DropdownMenuItem onClick={handleProfileClick}>
                 প্রোফাইল
               </DropdownMenuItem>
               <DropdownMenuItem onClick={signOutUser}>
