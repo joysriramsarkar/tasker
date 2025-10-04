@@ -1,6 +1,6 @@
 "use client";
 
-import { BarChart3, Bot, CheckSquare, History, LogOut } from 'lucide-react';
+import { BarChart3, Bot, CheckSquare, History, LogOut, User as UserIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import DashboardTab from './dashboard/dashboard-tab';
 import HistoryTab from './history/history-tab';
 import ReportTab from './report/report-tab';
 import TasksTab from './tasks/tasks-tab';
+import ProfileTab from './profile/profile-tab';
 
 export default function MainApp() {
   const { user } = useAuth();
@@ -58,7 +59,7 @@ export default function MainApp() {
         <main className="flex-1">
           <div className="container mx-auto px-4 py-8">
             <Tabs defaultValue="tasks" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-4">
+              <TabsList className="grid w-full grid-cols-2 sm:w-auto sm:grid-cols-5">
                 <TabsTrigger value="dashboard">
                   <BarChart3 className="mr-2 h-4 w-4" />
                   ড্যাশবোর্ড
@@ -70,6 +71,10 @@ export default function MainApp() {
                 <TabsTrigger value="history">
                   <History className="mr-2 h-4 w-4" />
                   ইতিহাস
+                </TabsTrigger>
+                 <TabsTrigger value="profile">
+                  <UserIcon className="mr-2 h-4 w-4" />
+                  প্রোফাইল
                 </TabsTrigger>
                 <TabsTrigger value="report">
                   <Bot className="mr-2 h-4 w-4" />
@@ -84,6 +89,9 @@ export default function MainApp() {
               </TabsContent>
               <TabsContent value="history" className="mt-6">
                 <HistoryTab />
+              </TabsContent>
+               <TabsContent value="profile" className="mt-6">
+                <ProfileTab />
               </TabsContent>
               <TabsContent value="report" className="mt-6">
                 <ReportTab />

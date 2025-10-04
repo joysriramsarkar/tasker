@@ -42,6 +42,11 @@ export function useTimer(initialSeconds = 0) {
   }, []);
 
   useEffect(() => {
+     setSeconds(initialSeconds);
+  }, [initialSeconds]);
+
+
+  useEffect(() => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -49,5 +54,5 @@ export function useTimer(initialSeconds = 0) {
     };
   }, []);
 
-  return { seconds, status, start, pause, resume, reset };
+  return { seconds, setSeconds, status, start, pause, resume, reset };
 }
