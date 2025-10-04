@@ -15,11 +15,11 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/firebase/auth-context";
 import { updateTask } from "@/firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
-import { formatDuration, parseDuration } from "@/lib/utils";
 import type { Task } from "@/types";
 import { Calendar } from "@/components/ui/calendar";
 import { bn } from "date-fns/locale";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "../ui/textarea";
 
 
 type Props = {
@@ -32,7 +32,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   const { user } = useAuth();
   const { toast } = useToast();
   const [title, setTitle] = useState(task.title);
-  const [durationStr, setDurationStr] = useState(formatDuration(task.duration));
+  const [description, setDescription] = useState(task.description || '');
   const [recurrence, setRecurrence] = useState(task.recurrence || 'none');
   const [date, setDate] = useState<Date | undefined>(
     task.dueDate ? task.dueDate.toDate() : new Date()
@@ -41,7 +41,7 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   useEffect(() => {
     if (isOpen) {
       setTitle(task.title);
-      setDurationStr(formatDuration(task.duration));
+      setDescription(task.description || '');
       setRecurrence(task.recurrence || 'none');
       setDate(task.dueDate ? task.dueDate.toDate() : new Date());
     }
@@ -49,12 +49,11 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
 
   const handleSave = async () => {
     if (!user || !date) return;
-    const finalDuration = parseDuration(durationStr);
     
     try {
         await updateTask(user.uid, task.id, { 
             title, 
-            duration: finalDuration,
+            description,
             recurrence: recurrence as Task['recurrence'],
             dueDate: date,
         });
@@ -86,15 +85,16 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
               className="col-span-3"
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="duration" className="text-right">
-              সময়
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label htmlFor="description" className="text-right pt-2">
+              বিবরণ
             </Label>
-            <Input
-              id="duration"
-              value={durationStr}
-              onChange={(e) => setDurationStr(e.target.value)}
-              className="col-span-3 font-mono"
+             <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="col-span-3"
+              placeholder="কাজটি সম্পর্কে আনুষঙ্গিক বিষয় লিখুন..."
             />
           </div>
            <div className="grid grid-cols-4 items-center gap-4">

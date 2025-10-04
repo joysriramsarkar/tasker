@@ -5,16 +5,16 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/firebase/auth-context";
 import { addTask } from "@/firebase/firestore";
-import { parseDuration } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "../ui/textarea";
 
 const formSchema = z.object({
   title: z.string().min(3, { message: "কাজের শিরোনাম কমপক্ষে ৩ অক্ষরের হতে হবে।" }),
-  duration: z.string().optional(),
+  description: z.string().optional(),
 });
 
 export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
@@ -22,15 +22,15 @@ export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
   const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: { title: "", duration: "" },
+    defaultValues: { title: "", description: "" },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) return;
-    const durationInSeconds = values.duration ? parseDuration(values.duration) : 0;
+    
     const taskId = await addTask(user.uid, {
         title: values.title,
-        duration: durationInSeconds,
+        description: values.description,
         dueDate: new Date(),
         recurrence: 'none'
     });
@@ -47,12 +47,13 @@ export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
     <Card className="mb-6">
       <CardContent className="p-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem className="flex-1">
+                   <FormLabel>কাজের শিরোনাম</FormLabel>
                   <FormControl>
                     <Input placeholder="একটি নতুন কাজের শিরোনাম লিখুন..." {...field} className="text-base h-12" />
                   </FormControl>
@@ -62,11 +63,12 @@ export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
             />
             <FormField
               control={form.control}
-              name="duration"
+              name="description"
               render={({ field }) => (
                 <FormItem>
+                   <FormLabel>বিবরণ</FormLabel>
                   <FormControl>
-                    <Input placeholder="সময় (HH:MM:SS)" {...field} className="w-40 font-mono h-12 text-base" />
+                    <Textarea placeholder="কাজটি সম্পর্কে আনুষঙ্গিক বিষয় লিখুন..." {...field} />
                   </FormControl>
                 </FormItem>
               )}
