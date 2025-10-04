@@ -3,7 +3,7 @@
 import type { Task } from "@/types";
 import { useAuth } from "@/firebase/auth-context";
 import { useTimer } from "@/hooks/use-timer";
-import { updateTask } from "@/firebase/firestore";
+import { updateTask, completeTask as completeTaskInDb } from "@/firebase/firestore";
 import { useEffect, useState } from "react";
 import { formatDurationBengali } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,11 +49,19 @@ export function TaskItem({ task }: { task: Task }) {
       await updateTask(user.uid, task.id, { status: "in-progress" });
     }
   };
-
+  
   const handleComplete = () => {
-    pause();
-    setIsCompleteModalOpen(true);
+      if (task.status === 'in-progress') {
+        pause();
+      }
+      setIsCompleteModalOpen(true);
   };
+
+  const handleFinalizeComplete = async (finalDuration: number) => {
+      if (!user) return;
+      await completeTaskInDb(user.uid, task, finalDuration);
+      setIsCompleteModalOpen(false);
+  }
 
   return (
     <>
@@ -78,7 +86,7 @@ export function TaskItem({ task }: { task: Task }) {
       <TimeCaptureModal 
         isOpen={isCompleteModalOpen} 
         onClose={() => setIsCompleteModalOpen(false)}
-        taskId={task.id}
+        onSave={handleFinalizeComplete}
         initialDuration={seconds}
       />
       <EditTaskModal

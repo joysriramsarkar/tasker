@@ -9,7 +9,7 @@ import {
   serverTimestamp,
   updateDoc,
   where,
-  writeBatch,
+  Timestamp,
 } from 'firebase/firestore';
 import type { Task } from '@/types';
 import { db } from './config';
@@ -19,17 +19,16 @@ const getTasksCollectionRef = (userId: string) =>
 
 export async function addTask(
   userId: string,
-  title: string,
-  duration = 0,
+  taskData: { title: string; duration: number, dueDate: Date }
 ): Promise<string | null> {
   try {
     const tasksCollection = getTasksCollectionRef(userId);
     const docRef = await addDoc(tasksCollection, {
-      title,
+      ...taskData,
       status: 'pending',
-      duration,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
+      recurrence: 'none',
     });
     return docRef.id;
   } catch (error) {
@@ -68,6 +67,34 @@ export function getTasks(
   );
 }
 
+export function getTasksForDateRange(
+  userId: string,
+  startDate: Date,
+  endDate: Date,
+  callback: (tasks: Task[]) => void
+): Unsubscribe {
+    const tasksCollection = getTasksCollectionRef(userId);
+    const q = query(
+        tasksCollection,
+        where('dueDate', '>=', Timestamp.fromDate(startDate)),
+        where('dueDate', '<=', Timestamp.fromDate(endDate)),
+        orderBy('dueDate', 'asc')
+    );
+
+    return onSnapshot(
+        q,
+        (querySnapshot) => {
+            const tasks = querySnapshot.docs.map(
+                (doc) => ({ id: doc.id, ...doc.data() } as Task)
+            );
+            callback(tasks);
+        },
+        (error) => {
+            console.error('Error getting tasks for date range: ', error);
+        }
+    );
+}
+
 export async function updateTask(
   userId: string,
   taskId: string,
@@ -88,17 +115,29 @@ export async function updateTask(
 
 export async function completeTask(
   userId: string,
-  taskId: string,
+  task: Task,
   duration: number
 ): Promise<boolean> {
   try {
-    const taskDoc = doc(db, 'users', userId, 'tasks', taskId);
+    const taskDoc = doc(db, 'users', userId, 'tasks', task.id);
     await updateDoc(taskDoc, {
       status: 'completed',
       duration,
       completedAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     });
+
+    if (task.recurrence === 'daily') {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        await addTask(userId, {
+            title: task.title,
+            duration: 0, // Reset duration for new recurring task
+            dueDate: tomorrow
+        });
+    }
+    // TODO: Add logic for weekly and monthly recurrence
+
     return true;
   } catch (error) {
     console.error('Error completing task: ', error);

@@ -12,20 +12,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/firebase/auth-context";
-import { completeTask } from "@/firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 import { formatDuration, parseDuration } from "@/lib/utils";
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  taskId: string;
+  onSave: (duration: number) => void;
   initialDuration: number;
 };
 
-export function TimeCaptureModal({ isOpen, onClose, taskId, initialDuration }: Props) {
-  const { user } = useAuth();
+export function TimeCaptureModal({ isOpen, onClose, onSave, initialDuration }: Props) {
   const { toast } = useToast();
   const [durationStr, setDurationStr] = useState(formatDuration(initialDuration));
 
@@ -36,15 +33,10 @@ export function TimeCaptureModal({ isOpen, onClose, taskId, initialDuration }: P
   }, [isOpen, initialDuration]);
 
   const handleSave = async () => {
-    if (!user) return;
     const finalDuration = parseDuration(durationStr);
-    const success = await completeTask(user.uid, taskId, finalDuration);
-    if (success) {
-      toast({ title: "কাজ সম্পন্ন হয়েছে!", description: "আপনার কাজটি সফলভাবে সম্পন্ন তালিকায় যোগ করা হয়েছে।" });
-      onClose();
-    } else {
-      toast({ variant: "destructive", title: "ত্রুটি", description: "কাজটি সম্পন্ন করতে ব্যর্থ।" });
-    }
+    onSave(finalDuration);
+    toast({ title: "কাজ সম্পন্ন হয়েছে!", description: "আপনার কাজটি সফলভাবে সম্পন্ন তালিকায় যোগ করা হয়েছে।" });
+    onClose();
   };
 
   return (

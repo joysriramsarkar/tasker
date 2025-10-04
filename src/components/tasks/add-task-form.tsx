@@ -28,7 +28,11 @@ export function AddTaskForm({ onTaskAdded }: { onTaskAdded: () => void }) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!user) return;
     const durationInSeconds = values.duration ? parseDuration(values.duration) : 0;
-    const taskId = await addTask(user.uid, values.title, durationInSeconds);
+    const taskId = await addTask(user.uid, {
+        title: values.title,
+        duration: durationInSeconds,
+        dueDate: new Date(),
+    });
     if (taskId) {
       toast({ title: "কাজ যোগ করা হয়েছে", description: values.title });
       form.reset();

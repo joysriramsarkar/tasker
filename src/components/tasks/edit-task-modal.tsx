@@ -33,9 +33,9 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
   const { toast } = useToast();
   const [title, setTitle] = useState(task.title);
   const [durationStr, setDurationStr] = useState(formatDuration(task.duration));
-   const [recurrence, setRecurrence] = useState(task.recurrence || 'none');
+  const [recurrence, setRecurrence] = useState(task.recurrence || 'none');
   const [date, setDate] = useState<Date | undefined>(
-    task.completedAt ? task.completedAt.toDate() : new Date()
+    task.dueDate ? task.dueDate.toDate() : new Date()
   );
 
   useEffect(() => {
@@ -43,19 +43,20 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
       setTitle(task.title);
       setDurationStr(formatDuration(task.duration));
       setRecurrence(task.recurrence || 'none');
-      setDate(task.completedAt ? task.completedAt.toDate() : new Date());
+      setDate(task.dueDate ? task.dueDate.toDate() : new Date());
     }
   }, [isOpen, task]);
 
   const handleSave = async () => {
-    if (!user) return;
+    if (!user || !date) return;
     const finalDuration = parseDuration(durationStr);
     
     try {
         await updateTask(user.uid, task.id, { 
             title, 
             duration: finalDuration,
-            recurrence: recurrence as Task['recurrence']
+            recurrence: recurrence as Task['recurrence'],
+            dueDate: date,
         });
         toast({ title: "কাজ আপডেট হয়েছে", description: "আপনার পরিবর্তনগুলি সফলভাবে সংরক্ষণ করা হয়েছে।" });
         onClose();
