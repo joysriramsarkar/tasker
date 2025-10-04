@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/lib/firebase/auth-context";
-import LoginPage from "@/components/login-page";
+import AuthPage from "@/components/auth-page";
 import MainApp from "@/components/main-app";
 import { Loader } from "@/components/loader";
 
@@ -17,7 +17,7 @@ export default function Home() {
   }
 
   if (!user) {
-    return <LoginPage />;
+    return <AuthPage />;
   }
 
   return <MainApp />;

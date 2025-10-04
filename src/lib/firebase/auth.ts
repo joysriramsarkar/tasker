@@ -5,8 +5,11 @@ import {
   FacebookAuthProvider,
   signInWithPopup,
   signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { auth } from './config';
+import { auth } from './auth-context';
+
 
 export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
@@ -27,6 +30,25 @@ export async function signInWithFacebook() {
     return { error };
   }
 }
+
+export async function signUpWithEmail(email: string, password: string) {
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    return { user: result.user };
+  } catch(error) {
+    return { error };
+  }
+}
+
+export async function signInWithEmail(email: string, password: string) {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return { user: result.user };
+  } catch(error) {
+    return { error };
+  }
+}
+
 
 export async function signOutUser() {
   try {

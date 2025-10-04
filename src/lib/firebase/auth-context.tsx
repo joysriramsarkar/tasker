@@ -1,11 +1,15 @@
 "use client";
 
 import type { User } from 'firebase/auth';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, browserLocalPersistence, initializeAuth } from 'firebase/auth';
 import type { ReactNode } from 'react';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { app } from './config';
 
-import { auth } from './config';
+// Initialize auth with browserLocalPersistence to avoid popup issues
+const auth = initializeAuth(app, {
+  persistence: browserLocalPersistence
+});
 
 type AuthContextType = {
   user: User | null;
@@ -38,3 +42,4 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+export { auth };

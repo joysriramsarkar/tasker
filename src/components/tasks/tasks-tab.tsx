@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { Loader } from "@/components/loader";
-import { Play, Pause, Square, Check } from "lucide-react";
+import { Play, Pause, Check } from "lucide-react";
 import { TimeCaptureModal } from "./time-capture-modal";
 
 const formSchema = z.object({
@@ -24,8 +24,7 @@ const formSchema = z.object({
 
 function TaskItem({ task }: { task: Task }) {
   const { user } = useAuth();
-  const { toast } = useToast();
-  const { seconds, status, start, pause, reset } = useTimer(task.duration);
+  const { seconds, status, start, pause } = useTimer(task.duration);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
@@ -150,7 +149,7 @@ export default function TasksTab() {
       <Card>
         <CardHeader>
             <CardTitle>চলমান কাজ</CardTitle>
-        </CardHeader>
+        </Header>
         <CardContent>
             {loading ? (
                 <div className="flex justify-center py-8"><Loader /></div>
