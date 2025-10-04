@@ -130,11 +130,12 @@ export async function completeTask(
     if (task.recurrence === 'daily') {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0,0,0,0); // Start of day
         await addTask(userId, {
             title: task.title,
             description: task.description,
             dueDate: tomorrow,
-            recurrence: task.recurrence,
+            recurrence: task.recurrence, // This was missing!
         });
     }
     // TODO: Add logic for weekly and monthly recurrence

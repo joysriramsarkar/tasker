@@ -2,77 +2,33 @@
 
 import type { Task } from "@/types";
 import { useAuth } from "@/firebase/auth-context";
-import { useTimer } from "@/hooks/use-timer";
-import { updateTask, completeTask as completeTaskInDb } from "@/firebase/firestore";
-import { useEffect, useState } from "react";
-import { formatDurationBengali } from "@/lib/utils";
+import { completeTask as completeTaskInDb } from "@/firebase/firestore";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Play, Pause, Check, Edit } from "lucide-react";
-import { TimeCaptureModal } from "./time-capture-modal";
+import { Check, Edit } from "lucide-react";
 import { EditTaskModal } from "./edit-task-modal";
+import { useToast } from "@/hooks/use-toast";
 
 export function TaskItem({ task }: { task: Task }) {
   const { user } = useAuth();
-  const { seconds, status, start, pause, setSeconds } = useTimer(task.duration);
-  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { toast } = useToast();
   
-  useEffect(() => {
-    setSeconds(task.duration);
-  }, [task.duration, setSeconds]);
-
-  useEffect(() => {
-    if (task.status === 'in-progress' && status !== 'running') {
-      start();
-    }
-     if (task.status === 'pending' && status === 'running') {
-      pause();
-    }
-  }, [task.status, status, start, pause]);
-  
-  useEffect(() => {
-    const persistDuration = async () => {
-      if (status === 'paused' && user && seconds !== task.duration) {
-        await updateTask(user.uid, task.id, { duration: seconds });
-      }
-    };
-    persistDuration();
-  }, [status, seconds, task.id, task.duration, user]);
-
-  const handleTogglePlay = async () => {
-    if (!user) return;
-    if (status === "running") {
-      pause();
-      await updateTask(user.uid, task.id, { status: "pending", duration: seconds });
-    } else {
-      start();
-      await updateTask(user.uid, task.id, { status: "in-progress" });
-    }
-  };
-  
-  const handleComplete = () => {
-      if (task.status === 'in-progress') {
-        pause();
-      }
-      setIsCompleteModalOpen(true);
-  };
-
-  const handleFinalizeComplete = async (finalDuration: number) => {
+  const handleComplete = async () => {
       if (!user) return;
-      await completeTaskInDb(user.uid, task, finalDuration);
-      setIsCompleteModalOpen(false);
-  }
+      const success = await completeTaskInDb(user.uid, task, task.duration);
+      if (success) {
+        toast({ title: "কাজ সম্পন্ন হয়েছে!", description: "আপনার কাজটি সফলভাবে সম্পন্ন তালিকায় যোগ করা হয়েছে।" });
+      } else {
+        toast({ variant: "destructive", title: "ত্রুটি", description: "কাজটি সম্পন্ন করতে ব্যর্থ।" });
+      }
+  };
 
   return (
     <>
       <div className="flex items-center justify-between gap-4 rounded-lg border bg-card p-4 transition-all hover:shadow-md">
         <span className="flex-1 font-medium">{task.title}</span>
         <div className="flex items-center gap-1 text-lg font-semibold tabular-nums text-muted-foreground">
-          <span className="font-mono">{formatDurationBengali(seconds)}</span>
-          <Button variant="ghost" size="icon" onClick={handleTogglePlay}>
-            {status === "running" ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-            <span className="sr-only">{status === "running" ? "Pause" : "Start"}</span>
-          </Button>
            <Button variant="ghost" size="icon" onClick={() => setIsEditModalOpen(true)}>
             <Edit className="h-5 w-5" />
             <span className="sr-only">Edit</span>
@@ -83,12 +39,6 @@ export function TaskItem({ task }: { task: Task }) {
           </Button>
         </div>
       </div>
-      <TimeCaptureModal 
-        isOpen={isCompleteModalOpen} 
-        onClose={() => setIsCompleteModalOpen(false)}
-        onSave={handleFinalizeComplete}
-        initialDuration={seconds}
-      />
       <EditTaskModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

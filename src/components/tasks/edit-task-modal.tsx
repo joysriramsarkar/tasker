@@ -20,6 +20,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { bn } from "date-fns/locale";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "../ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 
 type Props = {
@@ -108,19 +112,36 @@ export function EditTaskModal({ isOpen, onClose, task }: Props) {
                 <SelectContent>
                     <SelectItem value="none">কখনই না</SelectItem>
                     <SelectItem value="daily">প্রতিদিন</SelectItem>
-                    <SelectItem value="weekly">সাপ্তাহিক</SelectItem>
-                    <SelectItem value="monthly">মাসিক</SelectItem>
+                    <SelectItem value="weekly">সাপ্তাহিক (শীঘ্রই আসছে)</SelectItem>
+                    <SelectItem value="monthly">মাসিক (শীঘ্রই আসছে)</SelectItem>
                 </SelectContent>
             </Select>
            </div>
-           <div className="flex justify-center">
-             <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                className="rounded-md border"
-                locale={bn}
-            />
+           <div className="grid grid-cols-4 items-center gap-4">
+             <Label className="text-right">শেষ তারিখ</Label>
+             <Popover>
+                <PopoverTrigger asChild>
+                    <Button
+                    variant={"outline"}
+                    className={cn(
+                        "col-span-3 justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                    )}
+                    >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP", {locale: bn}) : <span>একটি তারিখ নির্বাচন করুন</span>}
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                    <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={setDate}
+                        locale={bn}
+                        initialFocus
+                    />
+                </PopoverContent>
+            </Popover>
            </div>
         </div>
         <DialogFooter>
