@@ -21,17 +21,14 @@ export default function LoginPage() {
   };
 
   const handleFacebookSignIn = async () => {
-    // const { error } = await signInWithFacebook();
-    // if (error) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "সাইন ইন ব্যর্থ হয়েছে",
-    //     description: "ফেসবুক দিয়ে সাইন ইন করার সময় একটি সমস্যা হয়েছে।",
-    //   });
-    // }
-    toast({
-      description: "ফেসবুক সাইন-ইন এখনো কনফিগার করা হয়নি।",
-    });
+    const { error } = await signInWithFacebook();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "সাইন ইন ব্যর্থ হয়েছে",
+        description: "ফেসবুক দিয়ে সাইন ইন করার সময় একটি সমস্যা হয়েছে।",
+      });
+    }
   };
 
   const handleNotImplemented = () => {
@@ -66,7 +63,7 @@ export default function LoginPage() {
              <Button variant="outline" onClick={handleNotImplemented} aria-label="Apple দিয়ে সাইন ইন করুন" disabled>
                 <AppleIcon className="h-5 w-5" />
             </Button>
-            <Button variant="outline" onClick={handleFacebookSignIn} aria-label="Facebook দিয়ে সাইন ইন করুন" disabled>
+            <Button variant="outline" onClick={handleFacebookSignIn} aria-label="Facebook দিয়ে সাইন ইন করুন">
                 <FacebookIcon className="h-5 w-5" />
             </Button>
             <Button variant="outline" onClick={handleNotImplemented} aria-label="Microsoft দিয়ে সাইন ইন করুন" disabled>
